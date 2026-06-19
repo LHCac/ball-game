@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!--
+  網頁版掛號模擬器（鮮艷圖示版）
+
+  本版在上一版的基礎上將配色調整得更加鮮艷，並重新加入小圖示使畫面更活潑。色彩更明亮，但仍維持高對比度與大按鈕、大字體等無障礙設計。
+  根據 W3C 的建議，文字與背景需要有足夠的對比度才能讓使用者清楚閱讀內容【206026667713543†L131-L149】。
+  主色調採用橙色與天藍色，背景為柔和的淺黃色，圖示採用 Emoji 裝飾於標題與按鈕，使操作更加直觀。
+-->
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>線上掛號服務</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">線上掛號服務</header>
+  <div id="app">
+    <div class="card">
+      <div class="progress" id="progress"></div>
+      <!-- 返回上一頁按鈕：當在第 2 關以上時顯示 -->
+      <button id="backBtn" class="btn btn-secondary hidden" aria-label="返回上一頁" style="width: 40%; min-height: var(--btn-height); align-self: flex-start; margin-bottom: 10px;">⬅️ 返回</button>
+
+      <!-- 第 1 關：拼圖組合後輸入基本資料 -->
+      <div class="step" id="step-1">
+        <div class="title">🧩 第一步：請拖曳文字完成提示</div>
+        <div id="puzzleSection" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+          <div class="description">將下方四個文字拖曳至上方空格，組合成「請輸入您的資料」</div>
+          <div class="drop-row" style="display: flex; justify-content: center; width: 100%; margin-bottom: 15px;">
+            <div class="drop-slot" data-target="請輸" aria-label="請輸"></div>
+            <div class="drop-slot" data-target="入您" aria-label="入您"></div>
+            <div class="drop-slot" data-target="的資" aria-label="的資"></div>
+            <div class="drop-slot" data-target="料" aria-label="料"></div>
+          </div>
+          <div class="drag-row" style="display: flex; justify-content: center; width: 100%; flex-wrap: wrap;">
+            <div class="drag-item" draggable="true" data-value="的資" aria-label="拖曳 的資">的資</div>
+            <div class="drag-item" draggable="true" data-value="請輸" aria-label="拖曳 請輸">請輸</div>
+            <div class="drag-item" draggable="true" data-value="料" aria-label="拖曳 料">料</div>
+            <div class="drag-item" draggable="true" data-value="入您" aria-label="拖曳 入您">入您</div>
+          </div>
+          <div id="puzzleMsg" class="description" style="color: red; min-height: 24px; margin-top: 10px;"></div>
+        </div>
+        <!-- 輸入區：拼圖完成後顯示 -->
+        <div id="inputSection1" class="input-section hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+          <div class="title" style="font-size: var(--font-title); margin-bottom: 10px;">✍️ 完成拼圖後輸入資料</div>
+          <input id="idInput" class="large-input" type="text" placeholder="請輸入身分證字號" aria-label="身分證字號輸入" maxlength="10">
+          <input id="dobInput" class="large-input" type="text" placeholder="請輸入出生年月日(如:0400101)" aria-label="出生年月日輸入" maxlength="7">
+          <button id="autoFillBtn" class="btn btn-secondary" aria-label="自動填寫假資料">✨ 點我自動填寫假資料</button>
+          <button id="nextBtn1" class="btn btn-primary hidden" aria-label="下一步">下一步</button>
+        </div>
+      </div>
+
+      <!-- 第 2 關：掛號方式配對 -->
+      <div class="step" id="step-2">
+        <div class="title">請拖曳文字選擇掛號方式</div>
+        <div class="description">將下方的「移動掛號」拖曳至您想選擇的方式</div>
+        <div style="width: 100%; display: flex; justify-content: space-around; margin-bottom: 20px;">
+          <div class="method-drop" data-value="網路掛號" aria-label="網路掛號" style="flex: 1; margin: 5px; min-height: var(--btn-height); background-color: #fff; border: 2px dashed var(--secondary-color); border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; font-size: var(--font-btn); color: var(--text-color);">
+            網路掛號
+          </div>
+          <div class="method-drop" data-value="行動掛號" aria-label="行動掛號" style="flex: 1; margin: 5px; min-height: var(--btn-height); background-color: #fff; border: 2px dashed var(--secondary-color); border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; font-size: var(--font-btn); color: var(--text-color);">
+            行動掛號
+          </div>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 20px;">
+          <div id="methodItem" class="drag-item" draggable="true" style="background-color: var(--primary-color); color: white; padding: 15px; border-radius: var(--border-radius); font-size: var(--font-btn); text-align: center; min-width: 60%; cursor: grab;" aria-label="移動掛號">
+            移動掛號
+          </div>
+        </div>
+        <button id="methodConfirmBtn" class="btn btn-primary hidden" aria-label="確定">確定</button>
+        <!-- 顯示所選掛號方式的提示文字 -->
+        <div id="methodMsg" class="description" style="color: var(--primary-color); min-height: 28px; margin-top: 10px;"></div>
+      </div>
+
+      <!-- 第 3 關：翻牌選擇看診科別 -->
+      <div class="step" id="step-3">
+        <div class="title">請翻開卡片選擇科別</div>
+        <div id="departmentsFlip" class="flip-container" style="width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 10px;">
+          <div class="flip-card" data-dept="家醫科" aria-label="家醫科卡片">
+            <div class="card-inner">
+              <div class="card-front">🩺</div>
+              <div class="card-back">家醫科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="心臟內科" aria-label="心臟內科卡片">
+            <div class="card-inner">
+              <div class="card-front">❤️</div>
+              <div class="card-back">心臟內科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="骨科" aria-label="骨科卡片">
+            <div class="card-inner">
+              <div class="card-front">🦴</div>
+              <div class="card-back">骨科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="眼科" aria-label="眼科卡片">
+            <div class="card-inner">
+              <div class="card-front">👁️</div>
+              <div class="card-back">眼科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="耳鼻喉科" aria-label="耳鼻喉科卡片">
+            <div class="card-inner">
+              <div class="card-front">👂</div>
+              <div class="card-back">耳鼻喉科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="營養諮詢科" aria-label="營養諮詢科卡片">
+            <div class="card-inner">
+              <div class="card-front">🥗</div>
+              <div class="card-back">營養諮詢科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="牙科" aria-label="牙科卡片">
+            <div class="card-inner">
+              <div class="card-front">🦷</div>
+              <div class="card-back">牙科</div>
+            </div>
+          </div>
+          <div class="flip-card" data-dept="復健科" aria-label="復健科卡片">
+            <div class="card-inner">
+              <div class="card-front">💆</div>
+              <div class="card-back">復健科</div>
+            </div>
+          </div>
+        </div>
+        <button id="deptConfirmBtn" class="btn btn-primary hidden" aria-label="科別確定">確定</button>
+      </div>
+
+      <!-- 第 4 關：選擇醫師 -->
+      <div class="step" id="step-4">
+        <div class="title">請選擇醫師</div>
+        <div class="description">按下「開始」按鈕隨機挑選醫師，再按「停止」決定您要看的醫師。</div>
+        <div id="doctorList" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <div class="doctor-item" data-name="陳醫師" aria-label="陳醫師">👨‍⚕️ 陳醫師</div>
+          <div class="doctor-item" data-name="李醫師" aria-label="李醫師">👩‍⚕️ 李醫師</div>
+          <div class="doctor-item" data-name="王醫師" aria-label="王醫師">👨‍⚕️ 王醫師</div>
+          <div class="doctor-item" data-name="劉醫師" aria-label="劉醫師">👩‍⚕️ 劉醫師</div>
+        </div>
+        <button id="startDoctorBtn" class="btn btn-secondary" aria-label="開始隨機選醫師">🎲 開始</button>
+        <button id="stopDoctorBtn" class="btn btn-secondary hidden" aria-label="停止隨機">🛑 停止</button>
+        <button id="doctorConfirmBtn" class="btn btn-primary hidden" aria-label="確定醫師選擇">確定</button>
+        <!-- 新增重新選擇醫師的按鈕：當選到醫師後，可重新開始遊戲 -->
+        <button id="restartDoctorBtn" class="btn btn-secondary hidden" aria-label="重新選擇醫師" style="margin-top: 10px;">重新選擇</button>
+        <!-- 顯示所選醫師的提示文字 -->
+        <div id="doctorMsg" class="description" style="color: var(--secondary-color); min-height: 28px; margin-top: 10px;"></div>
+      </div>
+
+      <!-- 第 5 關：輸入日期與選擇時段 -->
+      <div class="step" id="step-5">
+        <div class="title">請選擇看診日期與時間</div>
+        <!-- 日期輸入：讓長輩使用原生日期選擇器方便選擇日期 -->
+        <label class="description" for="dateInput">請選擇看診日期：</label>
+        <input id="dateInput" class="large-input" type="date" aria-label="看診日期輸入" style="max-width: 95%; margin-bottom: 20px;">
+        <!-- 時間選擇：提供四個固定的熱門時段按鈕 -->
+        <div id="timeOptions" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <div class="description">請選擇看診時間：</div>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%;">
+            <button class="btn btn-category time-btn" data-time="08:00" aria-label="上午08:00">上午 08:00</button>
+            <button class="btn btn-category time-btn" data-time="10:00" aria-label="上午10:00">上午 10:00</button>
+            <button class="btn btn-category time-btn" data-time="14:00" aria-label="下午14:00">下午 14:00</button>
+            <button class="btn btn-category time-btn" data-time="16:00" aria-label="下午16:00">下午 16:00</button>
+          </div>
+        </div>
+        <!-- 連接日期與時間的提示線：顯示所選日期與時段 -->
+        <div id="timeConnection" class="description hidden" style="margin: 10px 0; font-size: var(--font-body); color: var(--primary-color);"></div>
+        <button id="nextBtn5" class="btn btn-primary hidden" aria-label="下一步">下一步</button>
+      </div>
+
+      <!-- 第 6 關：按鍵盤選擇初診或複診 -->
+      <div class="step" id="step-6">
+        <div class="title">請選擇初診或複診</div>
+        <div class="description">如果要選擇初診，請按鍵盤上的 A 鍵；如果要選擇複診，請按鍵盤上的 L 鍵。</div>
+        <!-- 顯示按下的鍵與選擇結果 -->
+        <div id="keyboardMsg" class="description" style="min-height: 30px; margin-top: 10px;"></div>
+        <!-- 重新選擇按鈕：允許長輩重新按鍵選擇 -->
+        <button id="visitRenewBtn" class="btn btn-secondary hidden" aria-label="重新選擇初診或複診">重新選擇</button>
+        <!-- 確認按鈕：當完成選擇後顯示，進入下一步 -->
+        <button id="visitConfirmBtn" class="btn btn-primary hidden" aria-label="確認初診或複診">下一步</button>
+      </div>
+
+      <!-- 第 7 關：掛號成功與截圖教學 -->
+      <div class="step" id="step-7">
+        <div class="title">🎉 掛號成功！</div>
+        <div class="description" id="successMsg"></div>
+        <div class="description" style="border: 2px dashed var(--primary-color); padding: 20px; border-radius: var(--border-radius);">
+          【截圖小教學】看診號碼別忘記！請同時按下手機旁邊的『電源鍵』 + 『音量減低鍵』，把這個畫面拍下來喔！
+        </div>
+        <button id="screenshotBtn" class="btn btn-primary" aria-label="模擬手機截圖">📸 模擬手機截圖</button>
+        <div id="finalMsg" class="final-message" style="display: none;">太棒了！您已經學會網路掛號囉！</div>
+        <button id="restartBtn" class="btn btn-secondary hidden" aria-label="重新練習">🔄 重新練習</button>
+      </div>
+    </div> <!-- card 結束 -->
+  </div> <!-- app 結束 -->
+
+  <!-- 模態視窗（行動掛號提示） -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <p>小知識：『行動掛號』通常是指要另外下載醫院的 APP 喔！為了方便，我們今天先練習免下載的『網路掛號』，請點另一個按鈕試試看！</p>
+      <button id="modalCloseBtn" class="btn btn-primary">好的！</button>
+    </div>
+  </div>
+
+  <!-- 閃光效果 -->
+  <div id="flash" class="flash"></div>
+
+  <!-- confetti 容器 -->
+  <div id="confetti-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

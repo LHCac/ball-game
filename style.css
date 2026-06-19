@@ -1,0 +1,346 @@
+/* 色彩與尺寸設定：使用鮮豔色彩但保持對比度 */
+    :root {
+      --bg-color: #FFF8E1; /* 淡淡的黃色背景，柔和不刺眼 */
+      --primary-color: #FF7043; /* 鮮豔的橙色，適合作為主按鈕與標頭 */
+      --secondary-color: #29B6F6; /* 天藍色，作為次按鈕配色 */
+      --text-color: #333333; /* 深色文字 */
+      --btn-height: 70px;
+      --btn-width: 90%;
+      --font-title: 30px;
+      --font-body: 22px;
+      --font-btn: 24px;
+      --border-radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Arial", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 頁面標頭 */
+    .header {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      font-size: calc(var(--font-title) + 8px);
+      font-weight: bold;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      background-color: #ffffff;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .progress {
+      width: 100%;
+      font-size: var(--font-body);
+      margin-bottom: 20px;
+      text-align: right;
+      color: var(--secondary-color);
+    }
+
+    .step {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step.active {
+      display: flex;
+    }
+
+    .title {
+      font-size: var(--font-title);
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .description {
+      font-size: var(--font-body);
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .large-input {
+      width: 95%;
+      height: var(--btn-height);
+      font-size: var(--font-body);
+      padding: 10px 15px;
+      border: 2px solid var(--secondary-color);
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      width: var(--btn-width);
+      min-height: var(--btn-height);
+      font-size: var(--font-btn);
+      font-weight: bold;
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      margin: 10px 0;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary { background-color: var(--primary-color); }
+    .btn-secondary { background-color: var(--secondary-color); }
+    .btn-category { background-color: var(--primary-color); }
+    .btn-date { background-color: var(--secondary-color); }
+
+    /* 選擇時段按鈕高亮顯示 */
+    .time-btn.selected {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    /* 選擇字母按鈕高亮顯示 */
+    .letter-btn.selected {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .hidden { display: none !important; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: var(--border-radius);
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .modal-content p {
+      font-size: var(--font-body);
+      margin-bottom: 20px;
+      color: var(--text-color);
+    }
+
+    .flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 2000;
+    }
+
+    #confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1500;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 14px;
+      background-color: red;
+      opacity: 0.8;
+      transform: rotate(45deg);
+      border-radius: 2px;
+      animation: fall 3s linear forwards;
+    }
+
+    /* 拼圖拖曳與掛號方式配對樣式 */
+    .drag-item {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 15px;
+      margin: 5px;
+      font-size: var(--font-btn);
+      border-radius: var(--border-radius);
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .drag-item.hidden {
+      display: none;
+    }
+    .drop-slot {
+      border: 2px dashed var(--secondary-color);
+      background-color: #fff;
+      width: 22%;
+      min-height: var(--btn-height);
+      margin: 5px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-btn);
+      color: var(--text-color);
+    }
+    .drop-slot.filled {
+      background-color: var(--secondary-color);
+      color: white;
+      border-style: solid;
+    }
+    .method-drop.selected-method {
+      background-color: var(--primary-color);
+      color: white;
+      border-style: solid;
+      /* 被選擇的掛號方式提供更明顯的視覺提醒 */
+      box-shadow: 0 0 0 3px rgba(255,112,67,0.4);
+    }
+
+    /* 掛號方式提示文字：加大字體與粗體顯示，讓選擇結果一目瞭然 */
+    #methodMsg {
+      font-size: calc(var(--font-body) + 2px);
+      font-weight: bold;
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    /* 醫師選擇提示文字 */
+    #doctorMsg {
+      font-size: calc(var(--font-body) + 2px);
+      font-weight: bold;
+      color: var(--secondary-color);
+      text-align: center;
+    }
+
+    /* 醫師清單項目：定義在後方重寫現有樣式 */
+    /* 翻牌卡片樣式 */
+    .flip-card {
+      width: 45%;
+      max-width: 45%;
+      height: 110px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-btn);
+      border: 2px solid var(--secondary-color);
+      border-radius: var(--border-radius);
+    }
+    .card-front {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    .card-back {
+      background-color: var(--primary-color);
+      color: white;
+      transform: rotateY(180deg);
+    }
+    .flip-card.selected .card-back {
+      border: 4px solid #FFC107;
+    }
+
+    /* 選醫師清單樣式：使用白色底與邊框，提高對比；當前選中的醫師以次要色高亮 */
+    .doctor-item {
+      background-color: #ffffff;
+      color: var(--text-color);
+      width: 90%;
+      min-height: var(--btn-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-btn);
+      border-radius: var(--border-radius);
+      border: 2px solid var(--secondary-color);
+      cursor: pointer;
+    }
+    .doctor-item.active {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    .final-message {
+      font-size: var(--font-body);
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --font-title: 26px;
+        --font-body: 18px;
+        --font-btn: 22px;
+        --btn-height: 60px;
+      }
+    }
