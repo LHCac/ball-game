@@ -6,6 +6,60 @@ let selectedDate = "";
 let selectedTime = "";
 let visitStatus = "";
 
+// 各科別對應的醫師名單（依 3/7 所選科別顯示對應醫師）
+const doctorsByDept = {
+  '家醫科': [
+    { name: '陳醫師', icon: '👨‍⚕️' },
+    { name: '李醫師', icon: '👩‍⚕️' },
+    { name: '王醫師', icon: '👨‍⚕️' },
+    { name: '劉醫師', icon: '👩‍⚕️' }
+  ],
+  '心臟內科': [
+    { name: '張醫師', icon: '👨‍⚕️' },
+    { name: '黃醫師', icon: '👩‍⚕️' },
+    { name: '吳醫師', icon: '👨‍⚕️' },
+    { name: '楊醫師', icon: '👩‍⚕️' }
+  ],
+  '骨科': [
+    { name: '陳醫師', icon: '👨‍⚕️' },
+    { name: '林醫師', icon: '👩‍⚕️' },
+    { name: '蔡醫師', icon: '👨‍⚕️' },
+    { name: '鄭醫師', icon: '👩‍⚕️' }
+  ],
+  '眼科': [
+    { name: '何醫師', icon: '👨‍⚕️' },
+    { name: '呂醫師', icon: '👩‍⚕️' },
+    { name: '邱醫師', icon: '👨‍⚕️' },
+    { name: '潘醫師', icon: '👩‍⚕️' }
+  ],
+  '耳鼻喉科': [
+    { name: '謝醫師', icon: '👨‍⚕️' },
+    { name: '蘇醫師', icon: '👩‍⚕️' },
+    { name: '葉醫師', icon: '👨‍⚕️' },
+    { name: '郭醫師', icon: '👩‍⚕️' }
+  ],
+  '營養諮詢科': [
+    { name: '方營養師', icon: '🧑‍⚕️' },
+    { name: '周營養師', icon: '🧑‍⚕️' },
+    { name: '江營養師', icon: '🧑‍⚕️' },
+    { name: '賴營養師', icon: '🧑‍⚕️' }
+  ],
+  '牙科': [
+    { name: '徐醫師', icon: '👨‍⚕️' },
+    { name: '施醫師', icon: '👩‍⚕️' },
+    { name: '顏醫師', icon: '👨‍⚕️' },
+    { name: '洪醫師', icon: '👩‍⚕️' }
+  ],
+  '復健科': [
+    { name: '沈治療師', icon: '🧑‍⚕️' },
+    { name: '董治療師', icon: '🧑‍⚕️' },
+    { name: '龔治療師', icon: '🧑‍⚕️' },
+    { name: '詹治療師', icon: '🧑‍⚕️' }
+  ]
+};
+
+const weekdayCn = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+
 const progressEl = document.getElementById('progress');
 const backBtn = document.getElementById('backBtn');
 const steps = [];
@@ -38,38 +92,21 @@ function goToStep(step) {
 
   // 回到醫師選擇頁面時，根據已選醫師狀態調整按鈕顯示與訊息
   if (step === 4) {
-    if (selectedDoctor) {
-      if (doctorInterval) {
-        clearInterval(doctorInterval);
-        doctorInterval = null;
-      }
+    const currentDoctorItems = doctorList.querySelectorAll('.doctor-item');
 
-      doctorItems.forEach(item => {
-        if (item.getAttribute('data-name') === selectedDoctor) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
+    if (selectedDoctor) {
+      currentDoctorItems.forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-name') === selectedDoctor);
       });
 
-      startDoctorBtn.classList.add('hidden');
-      stopDoctorBtn.classList.add('hidden');
       doctorConfirmBtn.classList.remove('hidden');
       restartDoctorBtn.classList.remove('hidden');
       doctorMsg.textContent = '您選擇了醫師：' + selectedDoctor;
     } else {
-      doctorItems.forEach(item => item.classList.remove('active'));
-      startDoctorBtn.classList.remove('hidden');
-      stopDoctorBtn.classList.add('hidden');
+      currentDoctorItems.forEach(item => item.classList.remove('active'));
       doctorConfirmBtn.classList.add('hidden');
       restartDoctorBtn.classList.add('hidden');
       doctorMsg.textContent = '';
-      currentDoctorIndex = 0;
-
-      if (doctorInterval) {
-        clearInterval(doctorInterval);
-        doctorInterval = null;
-      }
     }
   }
 }
@@ -214,100 +251,143 @@ flipCards.forEach(card => {
 });
 
 deptConfirmBtn.addEventListener('click', () => {
+  selectedDoctor = '';
+  renderDoctorList(selectedDepartment);
   goToStep(4);
 });
 
-// 第 4 關：選擇醫師
-const doctorItems = document.querySelectorAll('#doctorList .doctor-item');
-const startDoctorBtn = document.getElementById('startDoctorBtn');
-const stopDoctorBtn = document.getElementById('stopDoctorBtn');
+// 第 4 關：選擇醫師（依 3/7 所選科別對應顯示 4 位醫師）
+const doctorList = document.getElementById('doctorList');
+const deptNameHint = document.getElementById('deptNameHint');
 const doctorConfirmBtn = document.getElementById('doctorConfirmBtn');
 const restartDoctorBtn = document.getElementById('restartDoctorBtn');
 const doctorMsg = document.getElementById('doctorMsg');
-let doctorInterval = null;
-let currentDoctorIndex = 0;
 
-startDoctorBtn.addEventListener('click', () => {
-  startDoctorBtn.classList.add('hidden');
-  stopDoctorBtn.classList.remove('hidden');
+// 依科別動態產生醫師清單
+function renderDoctorList(dept) {
+  const list = doctorsByDept[dept] || doctorsByDept['家醫科'];
+
+  deptNameHint.textContent = dept || '';
+  doctorList.innerHTML = '';
+  doctorMsg.textContent = '';
   doctorConfirmBtn.classList.add('hidden');
   restartDoctorBtn.classList.add('hidden');
 
-  doctorMsg.textContent = '';
-  currentDoctorIndex = 0;
+  list.forEach(doc => {
+    const item = document.createElement('div');
+    item.className = 'doctor-item';
+    item.setAttribute('data-name', doc.name);
+    item.setAttribute('aria-label', doc.name);
+    item.textContent = doc.icon + ' ' + doc.name;
 
-  doctorInterval = setInterval(() => {
-    doctorItems.forEach(item => item.classList.remove('active'));
+    item.addEventListener('click', () => {
+      selectedDoctor = doc.name;
 
-    doctorItems[currentDoctorIndex].classList.add('active');
-    currentDoctorIndex = (currentDoctorIndex + 1) % doctorItems.length;
-  }, 600);
-});
+      doctorList.querySelectorAll('.doctor-item').forEach(el => {
+        el.classList.toggle('active', el === item);
+      });
 
-stopDoctorBtn.addEventListener('click', () => {
-  if (doctorInterval) {
-    clearInterval(doctorInterval);
-  }
+      doctorConfirmBtn.classList.remove('hidden');
+      restartDoctorBtn.classList.remove('hidden');
+      doctorMsg.textContent = '您選擇了醫師：' + selectedDoctor;
+    });
 
-  doctorInterval = null;
-
-  const index = (currentDoctorIndex - 1 + doctorItems.length) % doctorItems.length;
-
-  doctorItems.forEach(item => item.classList.remove('active'));
-
-  const selectedItem = doctorItems[index];
-  selectedItem.classList.add('active');
-
-  selectedDoctor = selectedItem.getAttribute('data-name');
-
-  stopDoctorBtn.classList.add('hidden');
-  doctorConfirmBtn.classList.remove('hidden');
-  restartDoctorBtn.classList.remove('hidden');
-
-  doctorMsg.textContent = '您選擇了醫師：' + selectedDoctor;
-});
+    doctorList.appendChild(item);
+  });
+}
 
 doctorConfirmBtn.addEventListener('click', () => {
-  restartDoctorBtn.classList.add('hidden');
+  renderDateOptions();
   goToStep(5);
 });
 
 // 重新選擇醫師
 restartDoctorBtn.addEventListener('click', () => {
-  if (doctorInterval) {
-    clearInterval(doctorInterval);
-    doctorInterval = null;
-  }
-
-  doctorItems.forEach(item => item.classList.remove('active'));
-
   selectedDoctor = '';
-  doctorMsg.textContent = '';
 
-  startDoctorBtn.classList.remove('hidden');
-  stopDoctorBtn.classList.add('hidden');
+  doctorList.querySelectorAll('.doctor-item').forEach(item => item.classList.remove('active'));
+
+  doctorMsg.textContent = '';
   doctorConfirmBtn.classList.add('hidden');
   restartDoctorBtn.classList.add('hidden');
-
-  currentDoctorIndex = 0;
 });
 
-// 第 5 關：日期與時間輸入
-const dateInput = document.getElementById('dateInput');
+// 第 5 關：日期與時間選擇（日期依 4/7 所選醫師動態產生，間隔 2~3 天）
+const dateOptionsEl = document.getElementById('dateOptions');
+const dateHintEl = document.getElementById('dateHint');
 const timeButtons = document.querySelectorAll('#timeOptions .time-btn');
 const timeConnection = document.getElementById('timeConnection');
 const nextBtn5 = document.getElementById('nextBtn5');
 
+// 產生看診日期顯示文字，例如 7/3 (週五)
+function formatDateDisplay(d) {
+  return (d.getMonth() + 1) + '/' + d.getDate() + ' (' + weekdayCn[d.getDay()] + ')';
+}
+
+// 轉為 YYYY-MM-DD 供內部儲存使用
+function formatDateISO(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
+// 依所選醫師產生 3 個看診日期，彼此間隔 2~3 天
+function renderDateOptions() {
+  selectedDate = '';
+  nextBtn5.classList.add('hidden');
+  timeConnection.classList.add('hidden');
+  dateOptionsEl.innerHTML = '';
+
+  if (selectedDoctor) {
+    dateHintEl.textContent = selectedDoctor + ' 醫師可預約的看診日期：';
+  } else {
+    dateHintEl.textContent = '請選擇看診日期：';
+  }
+
+  const dates = [];
+  let cursor = new Date();
+  cursor.setDate(cursor.getDate() + (Math.floor(Math.random() * 3) + 1)); // 1~3 天後開始
+  dates.push(new Date(cursor));
+
+  for (let i = 0; i < 2; i++) {
+    const gap = Math.floor(Math.random() * 2) + 2; // 間隔 2~3 天
+    cursor.setDate(cursor.getDate() + gap);
+    dates.push(new Date(cursor));
+  }
+
+  dates.forEach(d => {
+    const btn = document.createElement('button');
+    const iso = formatDateISO(d);
+
+    btn.className = 'btn btn-category date-btn';
+    btn.setAttribute('data-date', iso);
+    btn.setAttribute('aria-label', '看診日期 ' + formatDateDisplay(d));
+    btn.textContent = formatDateDisplay(d);
+
+    btn.addEventListener('click', () => {
+      selectedDate = iso;
+
+      dateOptionsEl.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      checkDateTime();
+    });
+
+    dateOptionsEl.appendChild(btn);
+  });
+}
+
 function updateConnection() {
   if (selectedDate && selectedTime) {
-    timeConnection.textContent = '日期：' + selectedDate + ' ───▶ 時間：' + selectedTime;
+    const displayDate = dateOptionsEl.querySelector('.date-btn.selected') ? dateOptionsEl.querySelector('.date-btn.selected').textContent : selectedDate;
+    timeConnection.textContent = '日期：' + displayDate + ' ───▶ 時間：' + selectedTime;
     timeConnection.classList.remove('hidden');
   }
 }
 
 function checkDateTime() {
-  if (dateInput.value && selectedTime) {
-    selectedDate = dateInput.value;
+  if (selectedDate && selectedTime) {
     nextBtn5.classList.remove('hidden');
     updateConnection();
   } else {
@@ -315,11 +395,6 @@ function checkDateTime() {
     timeConnection.classList.add('hidden');
   }
 }
-
-dateInput.addEventListener('change', () => {
-  selectedDate = dateInput.value;
-  checkDateTime();
-});
 
 timeButtons.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -473,22 +548,14 @@ restartBtn.addEventListener('click', () => {
 
   deptConfirmBtn.classList.add('hidden');
 
-  doctorItems.forEach(item => item.classList.remove('active'));
-
-  startDoctorBtn.classList.remove('hidden');
-  stopDoctorBtn.classList.add('hidden');
+  doctorList.innerHTML = '';
+  deptNameHint.textContent = '';
   doctorConfirmBtn.classList.add('hidden');
-
-  if (doctorInterval) {
-    clearInterval(doctorInterval);
-  }
-
-  doctorInterval = null;
-  currentDoctorIndex = 0;
   doctorMsg.textContent = '';
   restartDoctorBtn.classList.add('hidden');
 
-  dateInput.value = '';
+  dateOptionsEl.innerHTML = '';
+  dateHintEl.textContent = '請選擇看診日期：';
   selectedDate = '';
   selectedTime = '';
 

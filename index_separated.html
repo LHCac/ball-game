@@ -16,6 +16,10 @@
 <body>
   <header class="header">線上掛號服務</header>
   <div id="app">
+    <div class="phone-frame">
+      <div class="side-btn power-btn" aria-hidden="true"></div>
+      <div class="side-btn volume-up" aria-hidden="true"></div>
+      <div class="side-btn volume-down" aria-hidden="true"></div>
     <div class="card">
       <div class="progress" id="progress"></div>
       <!-- 返回上一頁按鈕：當在第 2 關以上時顯示 -->
@@ -131,15 +135,8 @@
       <!-- 第 4 關：選擇醫師 -->
       <div class="step" id="step-4">
         <div class="title">請選擇醫師</div>
-        <div class="description">按下「開始」按鈕隨機挑選醫師，再按「停止」決定您要看的醫師。</div>
-        <div id="doctorList" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px;">
-          <div class="doctor-item" data-name="陳醫師" aria-label="陳醫師">👨‍⚕️ 陳醫師</div>
-          <div class="doctor-item" data-name="李醫師" aria-label="李醫師">👩‍⚕️ 李醫師</div>
-          <div class="doctor-item" data-name="王醫師" aria-label="王醫師">👨‍⚕️ 王醫師</div>
-          <div class="doctor-item" data-name="劉醫師" aria-label="劉醫師">👩‍⚕️ 劉醫師</div>
-        </div>
-        <button id="startDoctorBtn" class="btn btn-secondary" aria-label="開始隨機選醫師">🎲 開始</button>
-        <button id="stopDoctorBtn" class="btn btn-secondary hidden" aria-label="停止隨機">🛑 停止</button>
+        <div class="description">以下是<span id="deptNameHint"></span>的醫師，請點選一位您想看診的醫師。</div>
+        <div id="doctorList" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px;"></div>
         <button id="doctorConfirmBtn" class="btn btn-primary hidden" aria-label="確定醫師選擇">確定</button>
         <!-- 新增重新選擇醫師的按鈕：當選到醫師後，可重新開始遊戲 -->
         <button id="restartDoctorBtn" class="btn btn-secondary hidden" aria-label="重新選擇醫師" style="margin-top: 10px;">重新選擇</button>
@@ -150,9 +147,9 @@
       <!-- 第 5 關：輸入日期與選擇時段 -->
       <div class="step" id="step-5">
         <div class="title">請選擇看診日期與時間</div>
-        <!-- 日期輸入：讓長輩使用原生日期選擇器方便選擇日期 -->
-        <label class="description" for="dateInput">請選擇看診日期：</label>
-        <input id="dateInput" class="large-input" type="date" aria-label="看診日期輸入" style="max-width: 95%; margin-bottom: 20px;">
+        <div class="description" id="dateHint">請選擇看診日期：</div>
+        <!-- 日期選項：依所選醫師產生 3 個間隔 2~3 天的可預約日期 -->
+        <div id="dateOptions" style="width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px;"></div>
         <!-- 時間選擇：提供四個固定的熱門時段按鈕 -->
         <div id="timeOptions" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px;">
           <div class="description">請選擇看診時間：</div>
@@ -192,6 +189,7 @@
         <button id="restartBtn" class="btn btn-secondary hidden" aria-label="重新練習">🔄 重新練習</button>
       </div>
     </div> <!-- card 結束 -->
+    </div> <!-- phone-frame 結束 -->
   </div> <!-- app 結束 -->
 
   <!-- 模態視窗（行動掛號提示） -->
